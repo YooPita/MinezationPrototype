@@ -1,17 +1,20 @@
 using UnityEngine;
 
-public class MonkeAgent : MonoBehaviour
+public class MonkeAgent : MonoBehaviour, ICharacter
 {
     [SerializeField, Range(1, 5)] private float _speed = 1.0f;
+    [SerializeField] private Map _map;
     private Vector2 _targetPosition;
     private bool _positionReached = true;
     private MonkeAgentBrain _brain;
+    private MindMap _mindMap;
     private float _maxHungry = 100f;
     private float _hungry = 0f;
 
     public void Start()
     {
         _brain = new MonkeAgentBrain(this);
+        _mindMap = new MindMap();
         _hungry = _maxHungry;
     }
 
@@ -30,7 +33,6 @@ public class MonkeAgent : MonoBehaviour
         if (_hungry > 0)
             _hungry -= Time.deltaTime;
         _brain.Execute();
-        Debug.Log(_hungry);
     }
 
     public void Move(Vector2 position)
@@ -39,8 +41,23 @@ public class MonkeAgent : MonoBehaviour
         _positionReached = false;
     }
 
+    public void MoveToNearFoodSource()
+    {
+        if (_mindMap.FoodSourceExists())
+            Move(_mindMap.NearFoodSource(transform.position).Value);
+    }
+
     public float HungerDegree()
     {
         return _hungry / _maxHungry;
+    }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        IFoodSource foodSource = collision.GetComponent<IFoodSource>();
+        if (foodSource != null)
+        {
+            _mindMap.AddFoodSource(foodSource, collision.gameObject.transform.position);
+        }
     }
 }

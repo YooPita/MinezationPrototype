@@ -13,7 +13,7 @@ public class MonkeAgentBrain
 
     public void Execute()
     {
-        if (_monkeAgent.HungerDegree() < 0.8f)
-            _monkeAgent.Move(new Vector2(-4.910125f, 0.7686201f));
+        if (_monkeAgent.HungerDegree() < 0.96f)
+            _monkeAgent.MoveToNearFoodSource();
     }
 }
